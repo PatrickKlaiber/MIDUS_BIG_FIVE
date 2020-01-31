@@ -14,6 +14,8 @@ library(papaja)
 library(stargazer)
 library(apaTables)
 library(broom.mixed)
+library(reghelper)
+
 
 #load datasets####
 
@@ -654,5 +656,144 @@ lmer(num_pos_events ~
        Age_c + (1|ID), data = full) %>%summary
 
 
+#Subjective emotional experience uring pos. events
 
 
+
+#pleasant
+
+lm(pleasant_pm ~ NEURO_c + EXTRA_c + OPEN_c + CONS2_c +  AGREE_c +
+     Edu + Sex + Age_c , data = Baseline_refresher)%>% summary()
+
+lmer(pleasant ~ NEURO_c + EXTRA_c + OPEN_c + CONS2_c +  AGREE_c +
+     Edu + Sex + Age_c + (1|MRID), data = refresher)%>% summary()
+
+#calm
+lm(calm_pm ~ NEURO_c + EXTRA_c + OPEN_c + CONS2_c +  AGREE_c +
+     Edu + Sex + Age_c , data = Baseline_refresher)%>% summary
+
+lmer(calm ~ NEURO_c + EXTRA_c + OPEN_c + CONS2_c +  AGREE_c +
+     Edu + Sex + Age_c + (1|MRID) , data = refresher)%>% summary
+
+#surprise
+lm(surprise_pm ~ NEURO_c + EXTRA_c + OPEN_c + CONS2_c +  AGREE_c +
+     Edu + Sex + Age_c , data = Baseline_refresher)%>% summary
+
+lmer(surprise ~ NEURO_c + EXTRA_c + OPEN_c + CONS2_c +  AGREE_c +
+     Edu + Sex + Age_c + (1|MRID), data = refresher)%>% summary
+
+
+#close
+
+lm(close_pm ~ NEURO_c + EXTRA_c + OPEN_c + CONS2_c +  AGREE_c +
+     Edu + Sex + Age_c , data = Baseline_refresher)%>% summary
+
+lmer(close ~ NEURO_c + EXTRA_c + OPEN_c + CONS2_c +  AGREE_c +
+     Edu + Sex + Age_c +(1|MRID) , data = refresher)%>% summary
+
+#proud
+
+lm(proud_pm ~ NEURO_c + EXTRA_c + OPEN_c + CONS2_c +  AGREE_c +
+     Edu + Sex + Age_c , data = Baseline_refresher)%>% summary
+
+lmer(proud ~ NEURO_c + EXTRA_c + OPEN_c + CONS2_c +  AGREE_c +
+     Edu + Sex + Age_c +(1|MRID), data = refresher)%>% summary
+
+
+
+#Responsiveness to positive events####
+
+
+#model only within interaction
+
+#Positive Affect
+#Main Model
+respo_pa <- lmer(POSAV ~ 
+       EXTRA_c * npos_pc +
+       AGREE_c * npos_pc +
+       CONS2_c * npos_pc +
+       NEURO_c * npos_pc +
+       OPEN_c * npos_pc +
+       Sex + Age_c + Edu + npos_pm_c+  (1 + npos_pc| ID),
+     data = full) 
+
+respo_pa %>% summary()
+
+respo_pa %>% confint
+
+
+respo_pa %>% simple_slopes
+
+lmer(POSAV ~
+                   NEURO_c * npos_pc +
+                   EXTRA_c * npos_pc +
+                   AGREE_c * npos_pc +
+                   CONS2_c * npos_pc +
+                   
+                   OPEN_c * npos_pc +
+                   Sex + Age_c + Edu + npos_pm_c+  (1 + npos_pc| ID),
+                 data = full) %>% simple_slopes()
+
+#plot Extra
+
+
+plot_pa_extr <- 
+  respo_pa%>%plot_model(type = "eff", terms = c( "npos_pc", "EXTRA_c"),
+                                               title ="", 
+                                               axis.title = c("# of positive events (person centered)",
+                                                              "end of day positive affect [0-4]"),
+                                               legend.title = "Extraversion"
+                     )
+
+plot_pa_extr +
+  scale_color_manual(values = c("red", "blue", "green"),labels = c("-1SD", "mean", "+1SD"))+
+  theme(axis.title.x = element_text( size=16),
+        axis.title.y = element_text( size=16),
+        legend.position = c(0.45, 0.95),
+        legend.direction = "horizontal",
+        legend.title = element_text( size = 16),
+        legend.text = element_text( size = 16),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank())+
+  theme(axis.line.x = element_line(color="black", size = 1),
+        axis.line.y = element_line(color="black", size = 1))
+
+#Neuro
+
+
+plot_pa_neuro <-respo_pa%>%plot_model(type = "eff", terms = c( "npos_pc", "NEURO_c"),
+                                                title ="", 
+                                                axis.title = c("# of positive events (person centered)",
+                                                               "end of day positive affect [0-4]"),
+                                                legend.title = "Neuroticism"
+                      )
+
+plot_pa_neuro +
+  scale_color_manual(values = c("red", "blue", "green"),labels = c("-1SD", "mean", "+1SD"))+
+  theme(axis.title.x = element_text( size=16),
+        axis.title.y = element_text( size=16),
+        legend.position = c(0.45, 0.95),
+        legend.direction = "horizontal",
+        legend.title = element_text( size = 16),
+        legend.text = element_text( size = 16),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank())+
+  theme(axis.line.x = element_line(color="black", size = 1),
+        axis.line.y = element_line(color="black", size = 1))
+
+#Negative Affect
+
+respo_na <- lmer(NEGAV ~ 
+                   EXTRA_c * npos_pc +
+                   AGREE_c * npos_pc +
+                   CONS2_c * npos_pc +
+                   NEURO_c * npos_pc +
+                   OPEN_c * npos_pc +
+                   Sex + Age_c + Edu + npos_pm_c+  (1 + npos_pc| ID),
+                 data = full) 
+
+respo_na %>% summary()
+
+respo_na %>% confint
