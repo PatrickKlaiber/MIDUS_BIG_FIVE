@@ -15,6 +15,7 @@ library(stargazer)
 library(apaTables)
 library(broom.mixed)
 library(reghelper)
+library(lm.beta)
 
 
 #load datasets####
@@ -386,12 +387,16 @@ full$pos_social_pm_c <- scale(full$pos_social_pm, scale = F)
 
 
 
-#pleasant
+
 NSDE_refresher$RA2DF8B <- as.numeric(NSDE_refresher$RA2DF8B)
 NSDE_refresher$RA2DF9B <- as.numeric(NSDE_refresher$RA2DF9B)
 NSDE_refresher$RA2DF10B <- as.numeric(NSDE_refresher$RA2DF10B)
 NSDE_refresher$RA2DF11B <- as.numeric(NSDE_refresher$RA2DF11B)
 NSDE_refresher$RA2DF12B <- as.numeric(NSDE_refresher$RA2DF12B)
+
+
+
+#pleasant
 
 NSDE_refresher$pleasant <- mean_n(NSDE_refresher[,c(
   "RA2DF8B",
@@ -406,8 +411,8 @@ Baseline_refresher <- NSDE_refresher%>%
   merge(Baseline_refresher,.,by="MRID")
 
 #surprise
-NSDE_refresher$RA2DF8WB1 <- as.numeric(NSDE_refresher$RA2DF8WB1)
-NSDE_refresher$RA2DF9WB1 <- as.numeric(NSDE_refresher$RA2DF9WB1)
+NSDE_refresher$RA2DF8WB1 <- as.numeric( NSDE_refresher$RA2DF8WB1 )
+NSDE_refresher$RA2DF9WB1 <- as.numeric( NSDE_refresher$RA2DF9WB1 )
 NSDE_refresher$RA2DF10WB1 <- as.numeric(NSDE_refresher$RA2DF10WB1)
 NSDE_refresher$RA2DF11WB1 <- as.numeric(NSDE_refresher$RA2DF11WB1)
 NSDE_refresher$RA2DF12WB1 <- as.numeric(NSDE_refresher$RA2DF12WB1)
@@ -506,6 +511,36 @@ refresher <- merge(Baseline_refresher[,c("NEURO",
                                      "proud")],
                    by = "MRID", all.y = T, all.x = T)
 
+
+#for 3L analysis
+
+
+NSDE_refresher_3L_1 <- data.frame(day = NSDE_refresher$RA2DDAY, MRID =  NSDE_refresher$MRID, pleasant = NSDE_refresher$RA2DF8B ,surprise =NSDE_refresher$RA2DF8WB1 , calm = NSDE_refresher$RA2DF8WB4 , proud = NSDE_refresher$RA2DF8WB5 , close = NSDE_refresher$RA2DF8WB8  )
+NSDE_refresher_3L_2 <- data.frame(day = NSDE_refresher$RA2DDAY, MRID =  NSDE_refresher$MRID, pleasant = NSDE_refresher$RA2DF9B ,surprise =NSDE_refresher$RA2DF9WB1 , calm = NSDE_refresher$RA2DF9WB4 , proud = NSDE_refresher$RA2DF9WB5 , close = NSDE_refresher$RA2DF9WB8  )
+NSDE_refresher_3L_3 <- data.frame(day = NSDE_refresher$RA2DDAY, MRID =  NSDE_refresher$MRID, pleasant = NSDE_refresher$RA2DF10B,surprise =NSDE_refresher$RA2DF10WB1, calm = NSDE_refresher$RA2DF10WB4, proud = NSDE_refresher$RA2DF10WB5, close = NSDE_refresher$RA2DF10WB8 )
+NSDE_refresher_3L_4 <- data.frame(day = NSDE_refresher$RA2DDAY, MRID =  NSDE_refresher$MRID, pleasant = NSDE_refresher$RA2DF11B,surprise =NSDE_refresher$RA2DF11WB1, calm = NSDE_refresher$RA2DF11WB4, proud = NSDE_refresher$RA2DF11WB5, close = NSDE_refresher$RA2DF11WB8 )
+NSDE_refresher_3L_5 <- data.frame(day = NSDE_refresher$RA2DDAY, MRID =  NSDE_refresher$MRID, pleasant = NSDE_refresher$RA2DF12B,surprise =NSDE_refresher$RA2DF12WB1, calm = NSDE_refresher$RA2DF12WB4, proud = NSDE_refresher$RA2DF12WB5, close = NSDE_refresher$RA2DF12WB8 )
+
+
+
+NSDE_refresher_3L <- rbind(NSDE_refresher_3L_1,
+                           NSDE_refresher_3L_2,
+                           NSDE_refresher_3L_3,
+                           NSDE_refresher_3L_4,
+                           NSDE_refresher_3L_5)
+
+refresher_3L <- merge(Baseline_refresher[,c("NEURO",
+                                            "EXTRA",
+                                            "OPEN",
+                                            "CONS2",
+                                            "AGREE",
+                                            "Edu",
+                                            "Sex",
+                                            "Age",
+                                            "MRID")],
+                      NSDE_refresher_3L,
+                      by = "MRID", all.y = T, all.x = T)
+
 #personmeancenter subjective emotional experience
 
 NSDE_refresher <- NSDE_refresher%>%
@@ -531,6 +566,13 @@ refresher$OPEN_c <-  scale(refresher$OPEN , scale = F)
 refresher$CONS2_c <- scale(refresher$CONS2, scale = F)
 refresher$AGREE_c <- scale(refresher$AGREE, scale = F)
 refresher$Age_c <-   scale(refresher$Age, scale = F)
+
+refresher_3L$NEURO_c <- scale(refresher_3L$NEURO, scale = F)
+refresher_3L$EXTRA_c <- scale(refresher_3L$EXTRA, scale = F)
+refresher_3L$OPEN_c <-  scale(refresher_3L$OPEN , scale = F)
+refresher_3L$CONS2_c <- scale(refresher_3L$CONS2, scale = F)
+refresher_3L$AGREE_c <- scale(refresher_3L$AGREE, scale = F)
+refresher_3L$Age_c <-   scale(refresher_3L$Age, scale = F)
 
 #center in baseline refresher
 Baseline_refresher$NEURO_c <- scale(Baseline_refresher$NEURO, scale = F)
@@ -633,7 +675,7 @@ apa.cor.table(midus_comb[,c(
   "NEURO",
   "OPEN")])
 
-#Engagement in pos. events
+#Engagement in pos. events####
 
 lm(npos_pm ~ 
      scale(NEURO_c)+
@@ -644,6 +686,28 @@ lm(npos_pm ~
      Edu+
      Sex+
      Age_c, data = midus_comb) %>% summary
+
+
+lmer(num_pos_events ~ 
+       EXTRA_c+
+       AGREE_c+
+       CONS2_c+
+       NEURO_c+
+       OPEN_c +
+       Edu+
+       Sex+
+       Age_c + (1|ID), data = full) %>%summary
+
+lmer(num_pos_events ~ 
+       EXTRA_c+
+       AGREE_c+
+       CONS2_c+
+       NEURO_c+
+       OPEN_c +
+       Edu+
+       Sex+
+       Age_c + (1|ID), data = full) %>%confint(oldNames = F)
+
 
 lmer(num_pos_events ~ 
        scale(NEURO_c)+
@@ -656,50 +720,82 @@ lmer(num_pos_events ~
        Age_c + (1|ID), data = full) %>%summary
 
 
-#Subjective emotional experience uring pos. events
+#Subjective emotional experience uring pos. events####
 
 
 
 #pleasant
 
-lm(pleasant_pm ~ NEURO_c + EXTRA_c + OPEN_c + CONS2_c +  AGREE_c +
-     Edu + Sex + Age_c , data = Baseline_refresher)%>% summary()
+lm(pleasant_pm ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
+     Edu + Sex + Age_c , data = Baseline_refresher)%>%lm.beta%>% summary()
 
-lmer(pleasant ~ NEURO_c + EXTRA_c + OPEN_c + CONS2_c +  AGREE_c +
-     Edu + Sex + Age_c + (1|MRID), data = refresher)%>% summary()
+lmer(pleasant ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
+       Edu + Sex + Age_c + (1|MRID), data = refresher)%>% summary()
+
+lmer(pleasant ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
+       Edu + Sex + Age_c + (1|MRID), data = refresher)%>%confint()
+
+lmer(pleasant ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
+       Edu + Sex + Age_c + (1|MRID:day) + (1|MRID), data = refresher_3L)%>% summary()
+
+lmer(pleasant ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
+       Edu + Sex + Age_c + (1|MRID:day) + (1|MRID), data = refresher_3L)%>% confint()
 
 #calm
-lm(calm_pm ~ NEURO_c + EXTRA_c + OPEN_c + CONS2_c +  AGREE_c +
-     Edu + Sex + Age_c , data = Baseline_refresher)%>% summary
+lm(calm_pm ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
+     Edu + Sex + Age_c  , data = Baseline_refresher)%>%lm.beta%>%  summary
 
-lmer(calm ~ NEURO_c + EXTRA_c + OPEN_c + CONS2_c +  AGREE_c +
-     Edu + Sex + Age_c + (1|MRID) , data = refresher)%>% summary
+lmer(calm ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
+       Edu + Sex + Age_c  + (1|MRID) , data = refresher)%>% summary
+
+lmer(calm ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
+       Edu + Sex + Age_c + (1|MRID:day) + (1|MRID), data = refresher_3L)%>% summary()
+
+lmer(calm ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
+       Edu + Sex + Age_c + (1|MRID:day) + (1|MRID), data = refresher_3L)%>% confint()
 
 #surprise
-lm(surprise_pm ~ NEURO_c + EXTRA_c + OPEN_c + CONS2_c +  AGREE_c +
-     Edu + Sex + Age_c , data = Baseline_refresher)%>% summary
+lm(surprise_pm ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
+     Edu + Sex + Age_c  , data = Baseline_refresher)%>%lm.beta%>% summary
 
-lmer(surprise ~ NEURO_c + EXTRA_c + OPEN_c + CONS2_c +  AGREE_c +
-     Edu + Sex + Age_c + (1|MRID), data = refresher)%>% summary
+lmer(surprise ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
+       Edu + Sex + Age_c + (1|MRID), data = refresher)%>% summary
+
+lmer(surprise ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
+       Edu + Sex + Age_c + (1|MRID:day) + (1|MRID), data = refresher_3L)%>% summary()
+
+lmer(surprise ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
+       Edu + Sex + Age_c + (1|MRID:day) + (1|MRID), data = refresher_3L)%>%confint()
 
 
 #close
 
-lm(close_pm ~ NEURO_c + EXTRA_c + OPEN_c + CONS2_c +  AGREE_c +
-     Edu + Sex + Age_c , data = Baseline_refresher)%>% summary
+lm(close_pm ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
+     Edu + Sex + Age_c  , data = Baseline_refresher)%>%lm.beta%>% summary
 
-lmer(close ~ NEURO_c + EXTRA_c + OPEN_c + CONS2_c +  AGREE_c +
-     Edu + Sex + Age_c +(1|MRID) , data = refresher)%>% summary
+lmer(close ~ EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
+       Edu + Sex + Age_c  +(1|MRID) , data = refresher)%>% summary
+
+
+lmer(close ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
+       Edu + Sex + Age_c + (1|MRID:day) + (1|MRID), data = refresher_3L)%>% summary()
+
+lmer(close ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
+       Edu + Sex + Age_c + (1|MRID:day) + (1|MRID), data = refresher_3L)%>% confint(method = "Wald") #profile confidence intervals were not available
 
 #proud
 
-lm(proud_pm ~ NEURO_c + EXTRA_c + OPEN_c + CONS2_c +  AGREE_c +
-     Edu + Sex + Age_c , data = Baseline_refresher)%>% summary
+lm(proud_pm ~ EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
+     Edu + Sex + Age_c  , data = Baseline_refresher)%>%lm.beta%>% summary
 
-lmer(proud ~ NEURO_c + EXTRA_c + OPEN_c + CONS2_c +  AGREE_c +
-     Edu + Sex + Age_c +(1|MRID), data = refresher)%>% summary
+lmer(proud ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
+       Edu + Sex + Age_c  +(1|MRID), data = refresher)%>% summary
 
+lmer(proud ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
+       Edu + Sex + Age_c + (1|MRID:day) + (1|MRID), data = refresher_3L)%>% summary()
 
+lmer(proud ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
+       Edu + Sex + Age_c + (1|MRID:day) + (1|MRID), data = refresher_3L)%>% confint(oldNames = F)
 
 #Responsiveness to positive events####
 
@@ -709,7 +805,7 @@ lmer(proud ~ NEURO_c + EXTRA_c + OPEN_c + CONS2_c +  AGREE_c +
 #Positive Affect
 #Main Model
 respo_pa <- lmer(POSAV ~ 
-       EXTRA_c * npos_pc +
+        npos_pc* EXTRA_c  +
        AGREE_c * npos_pc +
        CONS2_c * npos_pc +
        NEURO_c * npos_pc +
@@ -719,7 +815,7 @@ respo_pa <- lmer(POSAV ~
 
 respo_pa %>% summary()
 
-respo_pa %>% confint
+respo_pa %>% confint(oldNames=F)
 
 
 respo_pa %>% simple_slopes
@@ -743,7 +839,7 @@ plot_pa_extr <-
                                                axis.title = c("# of positive events (person centered)",
                                                               "end of day positive affect [0-4]"),
                                                legend.title = "Extraversion"
-                     )
+                     )+ylim(0,4)
 
 plot_pa_extr +
   scale_color_manual(values = c("red", "blue", "green"),labels = c("-1SD", "mean", "+1SD"))+
@@ -767,7 +863,7 @@ plot_pa_neuro <-respo_pa%>%plot_model(type = "eff", terms = c( "npos_pc", "NEURO
                                                 axis.title = c("# of positive events (person centered)",
                                                                "end of day positive affect [0-4]"),
                                                 legend.title = "Neuroticism"
-                      )
+                      )+ylim(0,4)
 
 plot_pa_neuro +
   scale_color_manual(values = c("red", "blue", "green"),labels = c("-1SD", "mean", "+1SD"))+
@@ -796,4 +892,4 @@ respo_na <- lmer(NEGAV ~
 
 respo_na %>% summary()
 
-respo_na %>% confint
+respo_na %>% confint(oldNames = F)
