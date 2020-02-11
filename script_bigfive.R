@@ -16,6 +16,7 @@ library(apaTables)
 library(broom.mixed)
 library(reghelper)
 library(lm.beta)
+library(ggpubr)
 
 
 #load datasets####
@@ -833,15 +834,14 @@ lmer(POSAV ~
 #plot Extra
 
 
-plot_pa_extr <- 
+plot_pa_extr1 <- 
   respo_pa%>%plot_model(type = "eff", terms = c( "npos_pc", "EXTRA_c"),
                                                title ="", 
                                                axis.title = c("# of positive events (person centered)",
                                                               "end of day positive affect [0-4]"),
                                                legend.title = "Extraversion"
                      )+ylim(0,4)
-
-plot_pa_extr +
+plot_pa_extr <- plot_pa_extr1+
   scale_color_manual(values = c("red", "blue", "green"),labels = c("-1SD", "mean", "+1SD"))+
   theme(axis.title.x = element_text( size=16),
         axis.title.y = element_text( size=16),
@@ -855,17 +855,18 @@ plot_pa_extr +
   theme(axis.line.x = element_line(color="black", size = 1),
         axis.line.y = element_line(color="black", size = 1))
 
+
+
 #Neuro
 
 
-plot_pa_neuro <-respo_pa%>%plot_model(type = "eff", terms = c( "npos_pc", "NEURO_c"),
+plot_pa_neuro1 <-respo_pa%>%plot_model(type = "eff", terms = c( "npos_pc", "NEURO_c"),
                                                 title ="", 
                                                 axis.title = c("# of positive events (person centered)",
                                                                "end of day positive affect [0-4]"),
                                                 legend.title = "Neuroticism"
                       )+ylim(0,4)
-
-plot_pa_neuro +
+plot_pa_neuro <- plot_pa_neuro1+
   scale_color_manual(values = c("red", "blue", "green"),labels = c("-1SD", "mean", "+1SD"))+
   theme(axis.title.x = element_text( size=16),
         axis.title.y = element_text( size=16),
@@ -878,6 +879,13 @@ plot_pa_neuro +
         panel.background = element_blank())+
   theme(axis.line.x = element_line(color="black", size = 1),
         axis.line.y = element_line(color="black", size = 1))
+
+
+ggarrange(plot_pa_extr,plot_pa_neuro,
+          labels = c("A", "B"),
+          ncol = 2, nrow = 1)
+
+ggsave(filename = "Figure_3.jpg", height = 6, width = 12)
 
 #Negative Affect
 
