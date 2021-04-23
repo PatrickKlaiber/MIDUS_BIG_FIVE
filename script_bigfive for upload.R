@@ -19,18 +19,18 @@ library(lm.beta)
 library(ggpubr)
 
 
-#set WD to file directory
+#set working directory to file directory
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 
 #load datasets####
 
-#daily diary data refresher
+#daily diary data (NSDE) refresher
 load("data/refresher_NSDE.rda")
 NSDE_refresher <- da37083.0001
 rm(da37083.0001)
 
-#baseline data refresher
+#baseline data MIDUS refresher
 load("data/refresher_baseline.rda")
 Baseline_refresher <- da36532.0001
 rm(da36532.0001) 
@@ -40,7 +40,7 @@ load("data/MIDUS2_baseline.rda")
 Baseline_midus2 <- M2_P1_Milwaukee_P1_MERGED_N_5555_3_7_12_sav
 rm(M2_P1_Milwaukee_P1_MERGED_N_5555_3_7_12_sav)
 
-#daily diary data MIDUS2
+#daily diary data (NSDE) MIDUS2
 load("data/MIDUS2_NSDE.rda")
 NSDE_midus2 <- da26841.0001 #rename data set
 rm(da26841.0001)
@@ -103,39 +103,33 @@ NSDE_refresher$pos_social <- NSDE_refresher$RA2DF8r
 #personmean
 NSDE_midus2 <- NSDE_midus2%>%
   group_by(M2ID)%>%
-  summarise(npos_pm = mean(num_pos_events),
-            pos_social_pm = mean(pos_social, na.rm = T))%>%
+  summarise(npos_pm = mean(num_pos_events))%>%
   merge(NSDE_midus2,.,by ="M2ID")
 
 
 Baseline_midus2 <- NSDE_midus2%>%
   group_by(M2ID)%>%
-  summarise(npos_pm = mean(num_pos_events),
-            pos_social_pm = mean(pos_social, na.rm = T))%>%
+  summarise(npos_pm = mean(num_pos_events))%>%
   merge(Baseline_midus2,.,by ="M2ID")
 
 #personmean 
 
 NSDE_refresher <- NSDE_refresher%>%
   group_by(MRID)%>%
-  summarise(npos_pm = mean(num_pos_events),
-            pos_social_pm = mean(pos_social, na.rm = T))%>%
+  summarise(npos_pm = mean(num_pos_events))%>%
   merge(NSDE_refresher,.,by ="MRID")
 
 Baseline_refresher <- NSDE_refresher%>%
   group_by(MRID)%>%
-  summarise(npos_pm = mean(num_pos_events),
-            pos_social_pm = mean(pos_social, na.rm = T))%>%
+  summarise(npos_pm = mean(num_pos_events))%>%
   merge(Baseline_refresher,.,by ="MRID")
 
-#personmeancenter numb of pos events
+#personmeancenter number of pos events
 
 NSDE_refresher$npos_pc <- with(NSDE_refresher, num_pos_events - npos_pm)
 NSDE_midus2$npos_pc <- with(NSDE_midus2, num_pos_events - npos_pm)
-NSDE_refresher$pos_social_pc <- with(NSDE_refresher, pos_social - pos_social_pm)
-NSDE_midus2$pos_social_pc <- with(NSDE_midus2, pos_social - pos_social_pm)
 
-#create personmean of positive and negative affect
+#create personmeans of positive and negative affect
 
 Baseline_midus2 <- NSDE_midus2%>%
   group_by(M2ID)%>%
@@ -247,7 +241,6 @@ vars <- c(
   "race",
   "NA_pm",
   "PA_pm",
-  "pos_social_pm",
   "npos_pm",
   "wave"
   
@@ -275,72 +268,6 @@ midus_comb$Age_c <- scale(midus_comb$Age, scale = F)[,1]
 
 NSDE_midus2$npos_pm_c <- scale(NSDE_midus2$npos_pm, scale = F)[,1]
 Baseline_midus2$npos_pm_c <- scale(Baseline_midus2$npos_pm, scale = F)[,1]
-NSDE_midus2$pos_social_pm_c <- scale(NSDE_midus2$pos_social_pm, scale = F)[,1]
-Baseline_midus2$pos_social_pm_c <- scale(Baseline_midus2$pos_social_pm, scale = F)[,1]
-
-
-#rename affect variables for multilevel reliability analyses
-
-
-NSDE_midus2$NA1 <- (NSDE_midus2$B2DC1 %>% as.numeric)-1
-NSDE_midus2$NA2 <- (NSDE_midus2$B2DC2 %>% as.numeric)-1
-NSDE_midus2$NA3 <- (NSDE_midus2$B2DC3 %>% as.numeric)-1
-NSDE_midus2$NA4 <- (NSDE_midus2$B2DC4 %>% as.numeric)-1
-NSDE_midus2$NA5 <- (NSDE_midus2$B2DC5 %>% as.numeric)-1
-NSDE_midus2$NA6 <- (NSDE_midus2$B2DC6 %>% as.numeric)-1
-NSDE_midus2$NA7 <- (NSDE_midus2$B2DC13 %>% as.numeric)-1
-NSDE_midus2$NA8 <- (NSDE_midus2$B2DC14 %>% as.numeric)-1
-NSDE_midus2$NA9 <- (NSDE_midus2$B2DC15 %>% as.numeric)-1
-NSDE_midus2$NA10 <- (NSDE_midus2$B2DC16 %>% as.numeric)-1
-NSDE_midus2$NA11 <- (NSDE_midus2$B2DC17 %>% as.numeric)-1
-NSDE_midus2$NA12 <- (NSDE_midus2$B2DC18 %>% as.numeric)-1
-NSDE_midus2$NA13 <- (NSDE_midus2$B2DC19 %>% as.numeric)-1
-NSDE_midus2$NA14 <- (NSDE_midus2$B2DC20 %>% as.numeric)-1
-NSDE_midus2$PA1 <- (NSDE_midus2$B2DC7 %>% as.numeric)-1
-NSDE_midus2$PA2 <- (NSDE_midus2$B2DC8 %>% as.numeric)-1
-NSDE_midus2$PA3 <- (NSDE_midus2$B2DC9 %>% as.numeric)-1
-NSDE_midus2$PA4 <- (NSDE_midus2$B2DC10 %>% as.numeric)-1
-NSDE_midus2$PA5 <- (NSDE_midus2$B2DC11 %>% as.numeric)-1
-NSDE_midus2$PA6 <- (NSDE_midus2$B2DC12 %>% as.numeric)-1
-NSDE_midus2$PA7 <- (NSDE_midus2$B2DC21 %>% as.numeric)-1
-NSDE_midus2$PA8 <- (NSDE_midus2$B2DC22 %>% as.numeric)-1
-NSDE_midus2$PA9 <- (NSDE_midus2$B2DC23 %>% as.numeric)-1
-NSDE_midus2$PA10 <- (NSDE_midus2$B2DC24 %>% as.numeric)-1
-NSDE_midus2$PA11 <- (NSDE_midus2$B2DC25 %>% as.numeric)-1
-NSDE_midus2$PA12 <- (NSDE_midus2$B2DC26 %>% as.numeric)-1
-NSDE_midus2$PA13 <- (NSDE_midus2$B2DC27 %>% as.numeric)-1
-
-#rename affect variables for multilevel reliability analyses
-
-
-NSDE_refresher$NA1 <- (NSDE_refresher$RA2DC1 %>% as.numeric)-1
-NSDE_refresher$NA2 <- (NSDE_refresher$RA2DC2 %>% as.numeric)-1
-NSDE_refresher$NA3 <- (NSDE_refresher$RA2DC3 %>% as.numeric)-1
-NSDE_refresher$NA4 <- (NSDE_refresher$RA2DC4 %>% as.numeric)-1
-NSDE_refresher$NA5 <- (NSDE_refresher$RA2DC5 %>% as.numeric)-1
-NSDE_refresher$NA6 <- (NSDE_refresher$RA2DC6 %>% as.numeric)-1
-NSDE_refresher$NA7 <- (NSDE_refresher$RA2DC13 %>% as.numeric)-1
-NSDE_refresher$NA8 <- (NSDE_refresher$RA2DC14 %>% as.numeric)-1
-NSDE_refresher$NA9 <- (NSDE_refresher$RA2DC15 %>% as.numeric)-1
-NSDE_refresher$NA10 <- (NSDE_refresher$RA2DC16 %>% as.numeric)-1
-NSDE_refresher$NA11 <- (NSDE_refresher$RA2DC17 %>% as.numeric)-1
-NSDE_refresher$NA12 <- (NSDE_refresher$RA2DC18 %>% as.numeric)-1
-NSDE_refresher$NA13 <- (NSDE_refresher$RA2DC19 %>% as.numeric)-1
-NSDE_refresher$NA14 <- (NSDE_refresher$RA2DC20 %>% as.numeric)-1
-NSDE_refresher$PA1 <- (NSDE_refresher$RA2DC7 %>% as.numeric)-1
-NSDE_refresher$PA2 <- (NSDE_refresher$RA2DC8 %>% as.numeric)-1
-NSDE_refresher$PA3 <- (NSDE_refresher$RA2DC9 %>% as.numeric)-1
-NSDE_refresher$PA4 <- (NSDE_refresher$RA2DC10 %>% as.numeric)-1
-NSDE_refresher$PA5 <- (NSDE_refresher$RA2DC11 %>% as.numeric)-1
-NSDE_refresher$PA6 <- (NSDE_refresher$RA2DC12 %>% as.numeric)-1
-NSDE_refresher$PA7 <- (NSDE_refresher$RA2DC21 %>% as.numeric)-1
-NSDE_refresher$PA8 <- (NSDE_refresher$RA2DC22 %>% as.numeric)-1
-NSDE_refresher$PA9 <- (NSDE_refresher$RA2DC23 %>% as.numeric)-1
-NSDE_refresher$PA10 <- (NSDE_refresher$RA2DC24 %>% as.numeric)-1
-NSDE_refresher$PA11 <- (NSDE_refresher$RA2DC25 %>% as.numeric)-1
-NSDE_refresher$PA12 <- (NSDE_refresher$RA2DC26 %>% as.numeric)-1
-NSDE_refresher$PA13 <- (NSDE_refresher$RA2DC27 %>% as.numeric)-1
-
 
 
 ###ad day
@@ -373,9 +300,6 @@ midus2 <- merge(Baseline_midus2[,c(
                  "date",
                  "M2ID",
                  "num_pos_events",
-                 "pos_social",
-                 "pos_social_pm",
-                 "pos_social_pc",
                  "NA1", 
                  "NA2", 
                  "NA3", 
@@ -427,9 +351,6 @@ refresher <- merge(Baseline_refresher[,c(
                     "MRID",
                     "date",
                     "num_pos_events",
-                    "pos_social",
-                    "pos_social_pm",
-                    "pos_social_pc",
                     "NA1", 
                     "NA2", 
                     "NA3", 
@@ -482,18 +403,6 @@ full <- rbind(midus2,refresher)
 
 
 
-
-#dichotomous predictor
-
-full$npos_dicho <- full$num_pos_events%>%
-  recode_factor(`0` = "no",
-                `1` = "yes",
-                `2` = "yes",
-                `3` = "yes",
-                `4` = "yes",
-                `5` = "yes")
-
-
 ##center predictors in the full data set
 
 full$NEURO_c <- scale(full$NEURO, scale = F)[,1]
@@ -506,10 +415,6 @@ full$Age_c <- scale(  full$Age, scale = F)[,1]
 #grandmeancenter personmean
 
 full$npos_pm_c <- scale(full$npos_pm, scale = F)[,1]
-full$pos_social_pm_c <- scale(full$pos_social_pm, scale = F)[,1]
-
-
-
 
 NSDE_refresher$RA2DF8B <- as.numeric(NSDE_refresher$RA2DF8B)
 NSDE_refresher$RA2DF9B <- as.numeric(NSDE_refresher$RA2DF9B)
@@ -684,8 +589,6 @@ NSDE_refresher$close_pc <- NSDE_refresher$close - NSDE_refresher$close_pm
 NSDE_refresher$proud_pc <- NSDE_refresher$proud - NSDE_refresher$proud_pm
 
 #center predictors for analysis
-
-
 
 refresher_3L$NEURO_c <- scale(refresher_3L$NEURO, scale = F)[,1]
 refresher_3L$EXTRA_c <- scale(refresher_3L$EXTRA, scale = F)[,1]
@@ -960,7 +863,7 @@ m_engage$estimate[which(m_engage$term == "(Intercept)")] +
   ( m_engage$estimate[which(m_engage$term == "(Intercept)")] +
       m_engage$estimate[which(m_engage$term == "EXTRA_c")] * -sd_E) )*7
 
-#How many more positive events does a person high in O compared to a person low in O reports?
+#How many more positive events does a person high in O compared to a person low in O report?
 
 #SD of O
 sd_O <- sd(midus_comb$OPEN_c, na.rm = T)
@@ -994,7 +897,7 @@ m_engage$estimate[which(m_engage$term == "(Intercept)")] +
 
 
 
-#pleasant
+#Outcome: pleasant
 
 
 
@@ -1004,7 +907,7 @@ lmer(pleasant ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
 lmer(pleasant ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
        Edu + Sex + Age_c + (1|MRID:day) + (1|MRID), data = refresher_3L)%>% confint(oldNames = F)
 
-#calm
+#Outcome: calm
 
 
 lmer(calm ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
@@ -1013,7 +916,7 @@ lmer(calm ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
 lmer(calm ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
        Edu + Sex + Age_c + (1|MRID:day) + (1|MRID), data = refresher_3L)%>% confint(oldNames = F)
 
-#surprise
+#Outcome: surprise
 
 
 lmer(surprise ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
@@ -1023,7 +926,7 @@ lmer(surprise ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
        Edu + Sex + Age_c + (1|MRID:day) + (1|MRID), data = refresher_3L)%>%confint()
 
 
-#close
+#Outcome: close to others
 
 
 
@@ -1033,7 +936,7 @@ lmer(close ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
 lmer(close ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
        Edu + Sex + Age_c + (1|MRID:day) + (1|MRID), data = refresher_3L)%>% confint(method = "profile", devtol = 1e8) #profile confidence intervals were not available
 
-#proud
+#Outcome: proud
 
 
 
@@ -1046,6 +949,7 @@ lmer(proud ~  EXTRA_c +   AGREE_c + CONS2_c + NEURO_c + OPEN_c +
 
 #Affective Responsiveness to positive events####
 
+#Outcome: Positive Affect
 
 respo_pa <- lmer(POSAV ~ 
         npos_pc* EXTRA_c  +
@@ -1132,7 +1036,7 @@ ggarrange(plot_pa_extr,plot_pa_neuro,
 
 ggsave(filename = "Figure_3_2.jpg", height = 6, width = 12)
 
-#Negative Affect
+#Outcome: Negative Affect
 
 respo_na <- lmer(NEGAV ~ 
                    EXTRA_c * npos_pc +
